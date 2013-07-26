@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Will I Get Wet?</string>
+    <string name="action_settings">Settings</string>
+    <string name="latitude_title">Latitude:</string>
+    <string name="longitude_title">Longtude:</string>
+    <string name="longitude">-</string>
+    <string name="latitude">-</string>
+
+</resources>
