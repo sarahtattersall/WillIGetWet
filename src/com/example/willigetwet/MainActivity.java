@@ -27,7 +27,7 @@ import com.google.android.gms.location.LocationClient;
 
 public class MainActivity extends FragmentActivity implements
 		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
+		GooglePlayServicesClient.OnConnectionFailedListener {
 
 	/** LocationClient */
 	private LocationClient mLocationClient;
@@ -148,38 +148,6 @@ public class MainActivity extends FragmentActivity implements
 	public void onDisconnected() {
 		Toast.makeText(this, "Disconnected. Please re-connect.",
 				Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onLocationChanged(final Location location) {
-		mCurrentLocation = location;
-		if (mCurrentLocation != null) {
-			TextView latTextView = (TextView) findViewById(R.id.latitude_text);
-			latTextView
-					.setText(Double.toString(mCurrentLocation.getLatitude()));
-
-			TextView longTextView = (TextView) findViewById(R.id.longitude_text);
-			longTextView.setText(Double.toString(mCurrentLocation
-					.getLongitude()));
-		}
-	}
-
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
