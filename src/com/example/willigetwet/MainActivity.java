@@ -29,10 +29,17 @@ public class MainActivity extends FragmentActivity implements
 		GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
 
+	/** LocationClient */
 	private LocationClient mLocationClient;
+
+	/** Most current location */
 	private Location mCurrentLocation;
+
+	/** Progress bar to spin whilst locating address */
 	private ProgressBar mActivityIndicator;
-    private TextView mAddress;
+
+	/** Address text box */
+	private TextView mAddress;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +75,26 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * 
+	 * When connected shows lattitude, longitude and the address Uses
+	 * {@link GetAddressTask} in the background to load the address since it
+	 * takes time, therefore activates the progress bar for the time being until
+	 * GetAddressTask de-activates it
+	 * 
+	 * The location manager requestLocationUpdates is a fix due to Samsung GPS
+	 * issues. {@link http
+	 * ://stackoverflow.com/questions/16807986/gps-locations-are
+	 * -not-retrieved-properly}
+	 * 
+	 * 
+	 * @param bundle
+	 * 
+	 */
 	@Override
-	public void onConnected(Bundle arg0) {
+	public void onConnected(Bundle bundle) {
 		Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+
 		LocationManager manager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
@@ -102,24 +126,22 @@ public class MainActivity extends FragmentActivity implements
 			TextView longTextView = (TextView) findViewById(R.id.longitude_text);
 			longTextView.setText(Double.toString(mCurrentLocation
 					.getLongitude()));
+
+			// Ensure that a Geocoder services is available
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
+					&& Geocoder.isPresent()) {
+				// Show the activity indicator
+				mActivityIndicator.setVisibility(View.VISIBLE);
+				/*
+				 * Reverse geocoding is long-running and synchronous. Run it on
+				 * a background thread. Pass the current location to the
+				 * background task. When the task finishes, onPostExecute()
+				 * displays the address.
+				 */
+				(new GetAddressTask(this)).execute(mCurrentLocation);
+			}
 		}
-		
-		// Ensure that a Geocoder services is available
-        if (Build.VERSION.SDK_INT >=
-                Build.VERSION_CODES.GINGERBREAD
-                            &&
-                Geocoder.isPresent()) {
-            // Show the activity indicator
-            mActivityIndicator.setVisibility(View.VISIBLE);
-            /*
-             * Reverse geocoding is long-running and synchronous.
-             * Run it on a background thread.
-             * Pass the current location to the background task.
-             * When the task finishes,
-             * onPostExecute() displays the address.
-             */
-            (new GetAddressTask(this)).execute(mCurrentLocation);
-        }
+
 	}
 
 	@Override
@@ -234,19 +256,20 @@ public class MainActivity extends FragmentActivity implements
 				return "No address found";
 			}
 		}
-        /**
-         * A method that's called once doInBackground() completes. Turn
-         * off the indeterminate activity indicator and set
-         * the text of the UI element that shows the address. If the
-         * lookup failed, display the error message.
-         */
-        @Override
-        protected void onPostExecute(String address) {
-            // Set activity indicator visibility to "gone"
-            mActivityIndicator.setVisibility(View.GONE);
-            // Display the results of the lookup.
-            mAddress.setText(address);
-        }
+
+		/**
+		 * A method that's called once doInBackground() completes. Turn off the
+		 * indeterminate activity indicator and set the text of the UI element
+		 * that shows the address. If the lookup failed, display the error
+		 * message.
+		 */
+		@Override
+		protected void onPostExecute(String address) {
+			// Set activity indicator visibility to "gone"
+			mActivityIndicator.setVisibility(View.GONE);
+			// Display the results of the lookup.
+			mAddress.setText(address);
+		}
 	}
 
 }
